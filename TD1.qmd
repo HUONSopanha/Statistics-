@@ -1,0 +1,1074 @@
+---
+title: "TD1"
+author: "HUON Sopanha"
+format: html
+editor: visual
+---
+
+# 5. How People Get Their News The Brunswick Research Organization surveyed 50 randomly selected individuals and asked them the primary way they received the daily news. Their choices were via newspaper (N), television (T), radio (R), or Internet (I).Construct a categorical frequency distribution for the data and interpret the results.
+
+```{r}
+news<- c("N", "N", "T", "T", "T", "I", "R", "R", "I", "T",
+           "I", "N", "R", "R", "I", "N", "N", "I", "T", "N",
+           "I", "R", "T", "T", "T", "T", "N", "R", "R", "I",
+           "R", "R", "I", "N", "T", "R", "T", "I", "I", "T",
+           "T", "I", "N", "T", "T", "I", "R", "N", "R", "T")
+```
+
+```{r,, warning=FALSE, message=FALSE}
+```
+
+```{r,, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+table(news)%>%
+  as.tibble()%>%
+  mutate(freq = n,perc = (n/sum(n)*100))%>%
+  select(-n)%>%
+  bind_rows(tibble(news="Total",freq=sum(.$freq),perc=sum(.$perc)))%>%
+  knitr::kable(format = 'markdown')
+```
+
+# 7. Ages of the Vice Presidents at the Time of Their Death The ages of the Vice Presidents of the United States at the time of their death are listed below.
+
+# 90 83 80 73 70 51 68 79 70 71 72 74 67 54 81 66 62 63 68 57 66 96 78 55 60 66 57 71 60 85 76 98 77 88 78 81 64 66 77 93 70
+
+# (a) Use the data to construct a frequency distribution with 6 classes.
+
+# (b) Find the relative frequency.
+
+# (c) Construct a histogram, frequency polygon, and ogive.
+
+# Anwser
+
+# a-Use the data to construct a frequency distribution with 6 classes.
+
+```{r}
+library(tidyverse)
+Age <- c(90,83,80,73,70,51,68,79,70,71,72,74,67,
+         54,81,66,62,63,68,57,66,96,78,55,60,66,57,
+         71,60,85,76,98,77,88,78,81,64,66,77,93,70)
+number =round((max(Age)-min(Age))/6)
+breakss<-seq(min(Age),max(Age)+number,by=number)
+Age%>%
+  cut(breaks=breakss,right=FALSE)->Classes
+table(Classes)%>%
+  as.tibble()%>%
+  mutate(Freq=n)%>%
+  select(-n)->datasets
+datasets%>%
+  knitr::kable(format = 'markdown')
+```
+
+# b-Find the relative frequency.
+
+```{r}
+datasets%>%
+  mutate(Relative_freq=round(Freq*100/41,2))%>%
+  bind_rows(tibble(Classes="Total",
+                   Freq=sum(.$Freq),
+                   Relative_freq=as.integer(sum(.$Relative_freq)))
+            )%>%
+knitr::kable(format = 'markdown')
+```
+
+# (c) Construct a histogram, frequency polygon, and ogive.
+
+```{r}
+min=c()
+for (n in 1:6) {
+  r<-(breakss[n+1]+breakss[n])/2
+  min=c(min,r)
+}
+Age%>%
+  as.tibble()%>% 
+ggplot(aes(value)) +
+  geom_histogram(breaks=breakss,
+                 right=FALSE,
+                 col='blue',
+                 fill='red',)+
+  ggtitle('Age Before Dei')+
+  theme(plot.title = element_text(hjust=0.45))+
+  labs(x='Age',y='Frequancy', subtitle = 'Histogram')+
+  annotate("text", x =min, y=datasets$Freq, label =datasets$Freq)
+```
+
+```{r}
+hist(Age,
+     main='Age before dei',
+     sub='Frequency Polygon',
+     col="blue",
+     xlab='Age',
+     ylab='Frequency',
+     ylim = c(0,12),
+     breaks=breakss,
+     right = FALSE)
+lines(c(50,min,100),c(0,datasets$Freq,0),lwd=3,col='red')
+text(min,datasets$Freq,datasets$Freq)%>%
+knitr::kable(format = 'markdown')
+```
+
+```{r}
+c_freq = c(0,cumsum(table(Classes)))
+plot(breakss, c_freq,
+     xlab="Age",
+     ylab="Cumulative Frequency",
+     ylim=c(0,45))
+title(main='Age before dei',sub='Ogive')
+lines(breakss, c_freq,lwd=4,col='red')
+text(breakss,c_freq,c_freq)
+
+```
+
+# 9. Calories of Nuts The data show the number of calories per ounce in selected types of nuts. Construct vertical and horizontal bar graphs for the data.
+
+```{r}
+df<-tibble(
+  Types=c('Peanuts','Almonds','Macadamia', 'Pecans','Cashews'),
+   Calories=c(160,170,200,190,160)
+)
+knitr::kable(df,format = 'markdown')
+df%>%
+  ggplot(aes(Types,Calories,fill=Types))+
+  geom_bar(stat = "identity")+
+  ggtitle('Calories of Nuts',subtitle = "Vertical bar graphs")+
+  theme(plot.title = element_text(hjust=0.45))+
+  geom_text(aes(label=Calories),vjust=1.5)
+```
+
+```{r}
+df%>%
+  ggplot(aes(Calories,Types,fill=Types))+
+  geom_bar(stat = "identity")+
+  ggtitle('Calories of Nuts',subtitle = "Horizontal bar graphs")+
+  theme(plot.title = element_text(hjust=0.45))+
+  geom_text(aes(label=Calories),vjust=1.5)
+```
+
+# 11. High School Dropout Rate The data show the high school dropout rate for students for
+
+the years 2003 to 2009. Construct a time series graph and analyze the graph.
+
+```{r, warning=FALSE, message=FALSE}
+Rate<-tibble(
+  Time=c(2003 ,2004 ,2005 ,2006 ,2007 ,2008 ,2009),
+  percent = c(9.9 ,10.3 ,9.4 ,9.3, 8.7 ,8.0 ,8.1)
+)
+knitr::kable(Rate,format = 'markdown')
+ggplot(Rate,aes(Time,percent))+
+  geom_line()+
+  xlim(2002,2010)+
+  geom_point()+
+  geom_text(aes(label=percent),vjust=1.5)+
+  scale_x_continuous(breaks = seq(2002,2010,by=1),limits = c(2002,2010))+
+  ggtitle('High School Dropout Rate',subtitle = "Time series graph")+
+  theme(plot.title = element_text(hjust=0.45))
+```
+
+# 13. Career Changes A survey asked if people would like to spend the rest of their careers with their present employers. The results are shown. Construct a pie graph for the data and analyze the results.
+
+```{r}
+Career<-tibble(
+  Answer=c('Yes','No','Undecided'),
+   people= c(660,260,80)
+)
+knitr::kable(Career,format = 'markdown')
+ggplot(Career,aes('',people,fill = Answer))+
+  geom_bar(stat = "identity",width = 1)+
+  coord_polar('y',start=0)+
+  theme_void()+
+  geom_text(aes(label=paste(people*100/sum(people), "%", sep=" ")),position=position_stack(vjust=0.5))+
+    ggtitle('Career Changes',subtitle = "PeiChart graph")+
+  theme(plot.title = element_text(hjust=0.45),plot.subtitle = element_text(hjust=0.45))
+```
+
+#15. Songs on CDs The data show the number of songs on each of 40 CDs from the author’s collection. Construct a dotplot for the data and comment on the graph.
+
+```{r, warning=FALSE, message=FALSE}
+song<-c(10, 14, 18, 11, 11, 15, 16, 10, 10, 17, 10, 15, 22, 9, 14, 12, 18, 12, 12, 15, 21, 22, 20, 15, 10, 19, 20, 21, 10, 17, 9, 13, 15, 11, 12, 12, 9, 14, 20, 12, 10)
+PM<-c('null','null','null','null',song)
+M<-matrix(PM,nrow =9,ncol = 5 )
+knitr::kable(M,format = 'markdown')
+table(song)%>%
+  as.tibble()%>%
+  set_names('Number of song','freq')%>%
+  bind_rows(tibble('Number of song'="Total",freq=sum(.$freq)))%>%
+knitr::kable(format = 'markdown')
+df<-as.tibble(song)
+Number_of_Songs<-factor(df$value)
+ggplot(df,aes(x=value,fill =Number_of_Songs))+
+  geom_dotplot()+
+  xlab('Number of Songs')+
+  ylab('percentage')+
+  ggtitle(' Songs on CDs',subtitle = "Dotplot graph")+
+  theme(plot.title = element_text(hjust=0.45),plot.subtitle = element_text(hjust=0.45))+
+  xlim(8,23)+
+  scale_x_continuous(breaks=seq(7,24,1))
+
+```
+
+# 17. Draw a multiple bar graph for the following data which represented agricultural production for the priod from 2010-2013.
+
+```{r}
+data<-tibble(
+  years=c(2010,2011,2012,2013),
+  Food_grains=c(100,120,130,150),
+  Vegetable=c(30,40,45,50),
+  Other=c(10,15,25,25)
+)
+knitr::kable(data,format = 'markdown')
+data%>%
+  pivot_longer(cols=-years,
+             names_to = 'Produce',
+             values_to = 'Quantity')%>%
+  ggplot(aes(x=years,y=Quantity,fill = Produce))+
+  geom_col(position = 'dodge')+
+  guides(fill=guide_legend(title = 'Agricultural Production'))+
+  labs(y='Production(tones)')+
+    geom_text(aes(label=Quantity),position=position_dodge(0.9),vjust=0)+
+  ggtitle('Agricultural Production',subtitle = "Multiple bar graph graph")+
+  theme(plot.title = element_text(hjust=0.45),plot.subtitle = element_text(hjust=0.45))
+```
+
+# Peyton Manning’s Colts Career Peyton Manning played for the Indianapolis Colts for 14 years. (He did no t play in 2011.) The data show the number of touch-downs he scored for the years 1998–2010. Construct a dotplot for the data and comment on the graph.
+
+```{r, warning=FALSE, message=FALSE}
+Peyton<-c(26 ,33 ,27, 49, 31, 27, 33, 26, 26, 29, 28, 31, 33)
+PM<-c('null',Peyton)
+M<-matrix(PM,nrow =2,ncol = 7 )
+knitr::kable(M,format = 'markdown')
+table(Peyton)%>%
+  as.tibble()%>%
+  set_names('number of touch-downs','freq')%>%
+  bind_rows(tibble('number of touch-downs'="Total",freq=sum(.$freq)))%>%
+knitr::kable(format = 'markdown')
+df<-as.tibble(Peyton)
+people<-factor(df$value)
+ggplot(df,aes(x=value,fill =people))+
+  geom_dotplot()+
+  xlab('Number of touch-downs')+
+  ylab('Percentage')+
+  ggtitle('Peyton Manning’s Colts Career',subtitle = "Dotplot graph")+
+  theme(plot.title = element_text(hjust=0.45),plot.subtitle = element_text(hjust=0.45))+
+  xlim(25,50)+
+  scale_x_continuous(breaks=seq(25,50,1))+
+    guides(fill=guide_legend(title = 'Number of touch-downs'))
+
+```
+
+# 6. The traffic situation in X-City is getting worse, and it is high time a solution was offered.The company hired to work on the project took a survey of the estimated amount of vehicles that move on the road daily and for various intervals. The result of this survey is illustrated in the table below.Construct a multiple line graph to visualize the data. Hence, determine the vehicle with the highest frequency and that with the lowest frequency.
+
+```{r,, warning=FALSE, message=FALSE}
+vehicle <-tibble(
+  time = c('1-2pm','2-3pm','3-4pm','4-5pm'),
+  Car = c(37,44,23,29),
+  Bus = c(45,34,39,41),
+  Bike =c(42,26,27,48)
+)
+knitr::kable(vehicle,format = 'markdown')
+vehicle$time<-c(2,3,4,5)
+vehicle%>%
+bind_rows(tibble(time=1,Car=0,Bus=0,Bike=0))->vehicle
+vehicle%>%
+    pivot_longer(cols=-time,
+             names_to = 'Vehicle',
+             values_to = 'Frequency')->df
+df[order(df$Vehicle,decreasing = FALSE),]->df
+df%>%
+  ggplot(aes(x=time,y=Frequency,colour = factor(Vehicle)))+
+  geom_line(size=2)+
+  geom_point(size=3)+
+  annotate("text", x =df$time, y=df$Frequency, label =df$Frequency)+
+  guides(colour=guide_legend(title = 'Vehicle'))+
+  xlab('Time(pm)')+
+  ggtitle(' Survey Of The Estimated Amount Of Vehicles',subtitle = "Mutiple line graph")+
+  theme(plot.title = element_text(hjust=0.45),plot.subtitle = element_text(hjust=0.45))
+```
+
+# At 5pm:
+
+# -Bike is the hightest frequency.
+
+# -Car is the lowest frequency.
+
+# At 4pm:
+
+# -Bus is the hightest frequency.
+
+# -Car is the lowest frequency.
+
+# At 3pm:
+
+# -Car is the hightest frequency.
+
+# -Bike is the lowest frequency.
+
+# At 2pm:
+
+# -Bus is the hightest frequency.
+
+# -Car is the lowest frequency.
+
+#  19.Households of Four Television Networks Asurvey showed the number of viewers and number of households off our television networks. Find the average number of viewers,usingtheweightedmean.
+```{r}
+Huoseholds<-c(1.4,0.8,0.3,1.6)
+Viewers_in_millions<-c(1.6,0.8,0.4,1.8)
+df<-tibble(Huoseholds,Viewers_in_millions)
+knitr::kable(df,format = 'markdown')
+sum1<-0
+sum2<-0
+for (i in (1:4)){
+  sum1=sum1+(Huoseholds[i]*Viewers_in_millions[i])
+  sum2=sum2+(Huoseholds[i])
+}
+message("Average depends on weight is ",round(sum1/sum2,2) )
+```
+
+# 26. Checkeachdatasetforoutliers.
+ (a) 14,18,27,26,19,13,5,25
+ (b) 112,157,192,116,153,129,131
+
+```{r}
+check_int<-function(a){
+  n=(a*10)%%10
+  if(n==0){
+    return(TRUE)
+  }else{
+    return(FALSE)
+  }
+}
+```
+
+```{r}
+Q<-function(a){
+    a<-sort(a)
+  n=length(a)
+  c1=(n*25)/100
+  c3=(n*75)/100
+  if(check_int(c1)==TRUE){
+    Q1=(a[c1]+a[c1+1])/2
+  }else{
+    Q1=a[round(c1,0)]
+  }
+  if(check_int(c3)==TRUE){
+    Q3=(a[c3]+a[c3+1])/2
+  }else{
+    Q3=a[round(c3,0)]
+  }
+  return(c(Q1,Q3))
+}
+find_outier<-function(a){
+  a<-sort(a)
+  n=length(a)
+  Q13=Q(a)
+  Q1=Q13[1]
+  Q3=Q13[2]
+  IQR = Q3 - Q1
+  Domain = seq(round(Q1-1.5*IQR,0),round(Q3+1.5*IQR,0))
+  outier<-c()
+  for (i in  1:n){
+      if(a[i]%in%Domain==FALSE){
+        outier<-c(outier,a[i])
+    }
+  }
+  if(length(outier)==0){
+    message('There is not outier in data')
+  }else if(length(outier)==1){
+    message('Outier in data is ', outier)
+  }else{
+    message('Outier in data are: ')
+    for (i in 1:length(outier)) {
+      print(outier[i])
+    }
+  }
+}
+
+```
+# (a)14,18,27,26,19,13,5,25
+```{r}
+a<-c(14,18,27,26,19,13,5,25)
+find_outier(a)
+```
+#  (b) 112,157,192,116,153,129,131
+```{r}
+b<-c(112,157,192,116,153,129,131)
+find_outier(b)
+```
+# 27. The following sample data are them id term examination test scores for 30 students:
+
+ 55 60 91 85 60 70 89 99 59 67
+ 
+ 72 82 60 68 57 74 64 70 68 91
+ 
+ 89 90 83 40 79 85 71 80 76 81
+ 
+ a. Find the mean,mode,median,variance,standard deviation,𝑄1,and𝑄3 of the data.
+ 
+ b. Construct a frequency table with 5 classes.
+ 
+ c.Using the grouped data formula,find the mean,mode,median,variance,standard
+ deviation,𝑄1,and𝑄3 for the table in part(b)and compare it to the results in part(a).
+ 
+ d. Construct a histogram and comment on the shape of the distribution.
+ 
+ e. Find the percentile values of 55,60,and 74.
+```{r}
+mean<-function(a){
+  return(sum(a)/length(a))
+}
+mode<-function(a){
+  table(a)%>%
+    as.tibble()->df
+  r<-max(df[,'n'])
+  return(df[df$n==r,'a'])
+}
+median<-function(a){
+  sort(a)->a
+  n<-length(a)
+  if(n%%2==0){
+    m=(a[n/2]+a[(n/2)+1])/2
+  }else{
+    m=a[(n+1)/2]
+  }
+  return(m)
+}
+varaint<-function(a){
+  mean(a)->n
+  s=c()
+  for (i in 1:length(a)) {
+    s=c(s,(abs(a[i]-n))^2)
+  }
+  return(sum(s)/length(a))
+}
+classify<-function(a,n){
+  number =round((max(a)-min(a))/n)
+  breakss<-seq(min(a),max(a)+number,by=number)
+  a%>%
+    cut(breaks=breakss,right=FALSE)->Classes
+  table(Classes)%>%
+    as.tibble()%>%
+    mutate(Freq=n)%>%
+    select(-n)%>%
+    return()
+}
+```
+# a. Find the mean,mode,median,variance,standard deviation,𝑄1,and𝑄3 of the data.
+```{r}
+data<-c(55,60,91,85,60,70,89,99,59,67,72,82,60,68,57,74,64,70,68,91,89,90,83,40,79,85,71,80,76,81)
+data1<-data
+message('Mean of data is ',round(mean(data),2))
+mode(data)%>%
+  mutate(Mode=a)%>%
+  select(-a)%>%
+  knitr::kable(format = 'markdown')
+message("Median of data is ",median(data))
+message('Varaint of data is ',round(varaint(data),3))
+message('Standaed deviation of data is ',round(sqrt(varaint(data)),2))
+Q13=Q(data)
+Q1=Q13[1]
+Q3=Q13[2]
+message('Q1 of data is ',Q1)
+message('Q3 of data is ',Q3)
+```
+#  b. Construct a frequency table with 5 classes.
+```{r}
+knitr::kable(classify(data,5),format = 'markdown')
+```
+#  c.Using the grouped data formula,find the mean,mode,median,variance,standard deviation,𝑄1,and𝑄3 for the table in part(b)and compare it to the results in part(a).
+```{r}
+midpoint<-function(b){
+    mid<-c()
+  for (i in 1:length(b)-1) {
+    r<-(b[i]+b[i+1])/2
+    mid<-c(mid,r)
+  }
+    return(mid)
+}
+mean_class<-function(a,b){
+  mid=midpoint(b)
+  a%>%
+    mutate(Mid_range=mid)%>%
+    mutate(XM=Freq*Mid_range)->a
+a$XM%>%
+  sum()->sum
+  return(sum/sum(a$Freq))
+}
+varaint_class<-function(a,b){
+    mid=midpoint(b)
+    mean_class(a,b)->n
+  a%>%
+    mutate(Mid_range=mid)%>%
+    mutate(V=(Mid_range-n)^2)->a
+  sum(a$V)/sum(a$Freq)%>%
+    return()
+}
+```
+
+```{r}
+number =round((max(data)-min(data))/5)
+b<-seq(min(data),max(data)+number,by=number)
+data<-classify(data,5)
+```
+
+
+```{r}
+message('Mean of data is ',round(mean_class(data,b),2))
+message('Varaint of data is ',round(varaint_class(data,b),2))
+message('Standaed deviation of data is ',round(sqrt(varaint_class(data,b)),2))
+```
+
+# Median 
+$Q_{i}=l+\frac {(\frac{i\times n}{4}-CF)}{f} \times h$
+
+n is number of all data
+```{r}
+data%>%
+  mutate(upper=b[2:length(b)])->x
+# find comulative 
+cf<-c(x$Freq[1])
+  for (i in 1:length(x$Freq)-1) {
+    r<-cf[i]+x$Freq[i+1]
+    cf<-c(cf,r)
+  }
+x%>%
+  mutate(CF=cf)->x
+# find all data
+x$Freq%>%
+    sum()/2->t # find medium 
+# t=15 close to 16
+Cf=16 # Commulative of medium
+l=64 # lower of Medium
+f=9 # frequency of medium
+median=l+((t-Cf)/f)*number
+message("Median of data is ", round(median,2))
+```
+# Q1 and Q3
+```{r}
+x$Freq%>%
+    sum()/4->t # find position Q1
+# t=7.5 in 64-76
+Cf=16 # Commulative of Q1
+l=64 # lower of Q1
+f=9 # frequency of Q1
+Q1=l+((t-Cf)/f)*number
+message("Q1 of data is ", round(Q1,2))
+```
+```{r}
+x$Freq%>%
+    sum()*3/4->t # find position 
+# t=22.5 in 76-88
+Cf=24 # Commulative of Q3
+l=76 # lower of Q3
+f=8 # frequency of Q3
+Q3=l+((t-Cf)/f)*number
+message("Q3 of data is ", round(Q3,2))
+```
+#Mode
+
+$Mode=l+\frac {f_1-f_0}{2f_{1}-f_{0}-f_{2}} \times h$
+```{r}
+# highest frequency is 9 in 64-76
+l=64
+f1=9 
+f2=8# upper frequency column
+f0=6# lower frequency column
+Mode=l+number*(f1-f0)/(2*f1-f0-f2)
+message("Mode of data is ", round(Mode,2))
+```
+
+By part B and part A , We can said that the gruoped data have better statistic than the point data.It mean each data in part B are closer than each data in part A.   so Part B is better than Part A
+
+#  d. Construct a histogram and comment on the shape of the distribution.
+```{r}
+hist(data1,
+     main='Examination test scores',
+     sub='Histogram',
+     col="blue",
+     xlab='Score',
+     ylab='Frequency',
+     ylim=c(0,10),
+     breaks=b,
+     right = FALSE)
+text(midpoint(b),data$Freq,data$Freq)%>%
+knitr::kable(format = 'markdown')
+```
+```{r}
+sk=(mean_class(data,b)-median)*3/sqrt(varaint_class(data,b))
+message('Skewness = ',round(sk,2))
+```
+By the Skewness value we can said that graph is not symmetric.Therefor it is not approximate normal distribution.
+
+# e. Find the percentile values of 55,60,and 74.
+```{r}
+percentile<-function(a,n){
+  a<-sort(a)
+  count=0
+  for(i in 1:length(a)){
+    if(a[i]<n){
+      count=count+1
+    }
+  }
+  return(round((count+0.5)*100/length(a),2))
+}
+```
+
+```{r}
+message('Percentile of 55 is ',percentile(data1,55),'%')
+message('Percentile of 60 is ',percentile(data1,60),'%')
+message('Percentile of 74 is ',percentile(data1,74),'%')
+```
+#  28. For the following data:
+
+ 6.3 2.9 4.5 1.1 1.8 4.0 1.2 3.1 2.0 4.0
+ 
+ 7.0 2.8 4.3 5.3 2.9 8.3 4.4 2.8 3.1 5.6
+ 
+ 4.5 4.5 5.7 0.5 6.2 3.7 0.9 2.4 3.0 3.5
+ 
+ (a) Find the mean,mode,median,variance, standard deviation,𝑄1,𝑄3,and 90th percentile.
+ 
+ (b)Construct a frequency table with 5 classes.
+ 
+ (c)Using the grouped data formula,find the mean,mode,median,variance,standard
+ 
+ deviation,𝑄1,𝑄3,and 90th percentile for the frequency table constructed in part(b) and compare it to the
+ 
+ results in part(a).
+ (d)Construct a histogram,and comment on the shape of the data.
+ 
+# (a) Find the mean,mode,median,variance, standard deviation,𝑄1,𝑄3,and 90th percentile.
+```{r}
+position_per<-function(a,p){
+  a<-sort(a)
+  n=length(a)
+  c=(n*p)/100
+  if(check_int(c)==TRUE){
+    Q=(a[c]+a[c+1])/2
+  }else{
+    Q=a[round(c,0)]
+  }
+  return(Q)
+}
+```
+
+
+```{r}
+data<-c(6.3,2.9,4.5,1.1,1.8,4.0,1.2,3.1,2.0,4.0,7.0,2.8,4.3,2.9,8.3,4.4,2.8,3.1,5.6,4.5,4.5,5.7,0.5,6.2,3.7,0.9,2.4,3.0,3.5,5.3)
+data1<-data
+message('Mean of data is ',round(mean(data),2))
+mode(data)%>%
+  mutate(Mode=a)%>%
+  select(-a)%>%
+  knitr::kable(format = 'markdown')
+message("Median of data is ",median(data))
+message('Varaint of data is ',round(varaint(data),3))
+message('Standaed deviation of data is ',round(sqrt(varaint(data)),2))
+Q13=Q(data)
+Q1=Q13[1]
+Q3=Q13[2]
+message('Q1 of data is ',Q1)
+message('Q3 of data is ',Q3)
+message('90th percentile of data is ',position_per(data,90))
+```
+# (b)Construct a frequency table with 5 classes.
+```{r}
+classify_<-function(a,n){
+  number =round((max(a)-min(a))/n,1)
+  br<-seq(min(a),max(a)+number,by=number)
+  a%>%
+    cut(breaks=br,right=FALSE)%>%
+    table()%>%
+    as.tibble()%>%
+    mutate(Freq=c(6,9,8,5,2))%>%
+    select(-n)%>%
+    return()
+}
+```
+
+```{r}
+knitr::kable(classify_(data,5),format = 'markdown')
+```
+#  (c)Using the grouped data formula,find the mean,mode,median,variance,standard deviation,𝑄1,𝑄3,and 90th percentile for the frequency table constructed in part(b) and compare it to the results in part(a).
+```{r}
+number =round((max(data)-min(data))/5,1)
+b<-seq(min(data),max(data)+number,by=number)
+data<-classify_(data,5)
+```
+
+
+```{r}
+message('Mean of data is ',round(mean_class(data,b),2))
+message('Varaint of data is ',round(varaint_class(data,b),2))
+message('Standaed deviation of data is ',round(sqrt(varaint_class(data,b)),2))
+```
+
+# Median 
+$Q_{i}=l+\frac {(\frac{i\times n}{4}-CF)}{f} \times h$
+n is number of all data
+```{r}
+data%>%
+  mutate(upper=b[2:length(b)])->x
+# find comulative 
+cf<-c(x$Freq[1])
+  for (i in 1:length(x$Freq)-1) {
+    r<-cf[i]+x$Freq[i+1]
+    cf<-c(cf,r)
+  }
+x%>%
+  mutate(CF=cf)->x
+knitr::kable(x,format = 'markdown')
+# find all data
+x$Freq%>%
+    sum()/2->t 
+# find medium 
+# t=15 close to 20
+Cf=15 # Commulative of medium
+l=2.1 # lower of Medium
+f=9 # frequency of medium
+median=l+((t-Cf)/f)*number
+message("Median of data is ", round(median,2))
+```
+# Q1 and Q3
+```{r}
+x$Freq%>%
+    sum()/4->t# find position Q1
+# t=7.5 in [2.1,3.7)	
+Cf=15 # Commulative of Q1
+l=2.1 # lower of Q1
+f=9 # frequency of Q1
+Q1=l+((t-Cf)/f)*number
+message("Q1 of data is ", round(Q1,2))
+```
+```{r}
+x$Freq%>%
+    sum()*3/4->t # find position 
+# t=22.5 in [3.7,5.3)	
+Cf=23 # Commulative of Q3
+l=3.7 # lower of Q3
+f=8 # frequency of Q3
+Q3=l+((t-Cf)/f)*number
+message("Q3 of data is ", round(Q3,2))
+```
+#Mode
+
+$Mode=l+\frac {f_1-f_0}{2f_{1}-f_{0}-f_{2}} \times h$
+```{r}
+# highest frequency is 9 in [2.1,3.7)	
+l=2.1
+f1=9 
+f2=8# upper frequency column
+f0=6# lower frequency column
+Mode=l+number*(f1-f0)/(2*f1-f0-f2)
+message("Mode of data is ", round(Mode,2))
+```
+
+# 90th percentile 
+
+$P_{i}=l+\frac {(\frac{i\times n}{100}-CF_<)}{f} \times h$
+
+$CF_<$ is cumulative frequency of the class previous to percentile class
+```{r}
+x$Freq%>%
+    sum()*90/100->t # find position 
+# t=27 in [5.3,6.9)	
+Cf=23 
+l=5.3 # lower of Q3
+f=5 # frequency of Q3
+Q=l+((t-Cf)/f)*number
+message("90th percentile of data is ", round(Q,2))
+```
+By part B and part A , We can said that the gruoped data have better statistic than the point data.It mean each data in part B are closer than each data in part A.   so Part B is better than Part A
+
+#  d. Construct a histogram and comment on the shape of the distribution.
+```{r}
+hist(data1,
+     main='Data',
+     sub='Histogram',
+     col="blue",
+     xlab='Data',
+     ylab='Frequency',
+     ylim=c(0,10),
+     breaks=b,
+     right = FALSE)
+text(midpoint(b),data$Freq,data$Freq)%>%
+knitr::kable(format = 'markdown')
+```
+
+```{r}
+sk=(mean_class(data,b)-median)*3/sqrt(varaint_class(data,b))
+message('Skewness = ',round(sk,2))
+```
+By the Skewness value we can said that graph is not symmetric.Therefor it is not approximate normal distribution. It is positively Skewness.
+
+# 29. In recent years,due to low interestrates , many home owners refinanced their home mort gages.Linda Lahey is a mortgage of ficer at Down River Federal Saving sand Loan. 
+
+# Below is the amount refinanced for 20 loans she processed last week. The data are reported in thousands of dollar sand arranged from smallest to largest.
+
+ 59.2 59.5 61.6 65.5 66.6 72.9 74.8 77.3 79.2 83.7+
+ 
+ 85.6 85.8 86.6 87.0 87.1 90.2 93.3 98.6 100.2 100.7
+ 
+ a. Find the median,first quartile ,and third quartile.
+ 
+ b. Find the 26 th and 83 rd percentiles.
+ 
+ c.Draw a box plot of the data and comment on the shape of the distribution.
+ 
+#  a. Find the median,first quartile ,and third quartile.
+```{r}
+Q<-function(a){
+    a<-sort(a)
+  n=length(a)
+  c1=(n*25)/100
+  c3=(n*75)/100
+  if(check_int(c1)==TRUE){
+    Q1=(a[c1]+a[c1+1])/2
+  }else{
+    Q1=a[round(c1,0)]
+  }
+  if(check_int(c3)==TRUE){
+    Q3=(a[c3]+a[c3+1])/2
+  }else{
+    Q3=a[round(c3,0)]
+  }
+  return(c(Q1,Q3))
+}
+```
+
+```{r}
+data<-c(59.2,59.5,61.6,65.5,66.6,72.9,
+        74.8,77.3,79.2,83.7,85.6,85.8,
+        86.6,87.0,87.1,90.2,93.3,98.6,
+        100.2,100.7)
+message("Median of data is ",median(data))
+Q13=Q(data)
+Q1=Q13[1]
+Q3=Q13[2]
+message('Q1 of data is ',Q1)
+message('Q3 of data is ',Q3)
+```
+
+# b. Find the 26th and 83rd percentiles.
+
+```{r}
+message('26th percentile of data is ',position_per(data,26))
+message('83th percentile of data is ',position_per(data,83))
+```
+# c.Draw a boxplot of the data and comment on the shape of the distribution.
+```{r}
+data%>%
+  as.tibble()%>%
+  ggplot(aes(x=value))+
+  theme_minimal()+
+  geom_boxplot(fill = "#0099f8")+
+  xlab('Data')+
+  ggtitle('BOX plot')+
+  theme(plot.title = element_text(hjust=0.45))
+```
+By graph we can said that graph is not symmetric.Therefor it is not approximate normal distribution. It is negatively skewed.
+
+#  30.Hours Worked The data shown herere present the number of hours that 12 part-time employee statoy store worked during the weeks before and after Christmas .Construct two boxplots and compare the distributions.
+```{r}
+Before<-c(38,16,18,24,12,30,35,32,31,30,24,35)
+After<-c(26,15,12,18,24,32,14,18,16,18,22,12)
+data<-tibble(Before,After)
+knitr::kable(data,format = 'markdown')
+```
+```{r}
+data%>%
+  ggplot()+
+  geom_boxplot(aes(x=Before,y='Before'),fill = "#0099f8")+
+  geom_boxplot(aes(x=After,y='After'),fill = "red")+
+  xlab('Data')+
+  ggtitle('HoursWorked',subtitle = "Mutiple Boxplot")+
+  theme(plot.title = element_text(hjust=0.45),plot.subtitle = element_text(hjust=0.45))
+  
+```
+
+By the graph After is more approximate normal distribution than Before. After is positively skewed . Before is negatively skewed.
+
+
+#  31.Many times in statistics it is necessary to see if a set of data values is approximately normally distributed.There are special techniques that can beused. 
+# One technique is to draw a histogram for the data and see if it is approximately bell-shaped. (Note: It does not have to be exactly symmetric to bebell-shaped.)The number sofbranches of the 50top libraries are shown.
+
+ 67 84 80 77 97 59 62 37 33 42
+ 
+ 36 54 18 12 19 33 49 24 25 22
+ 
+ 24 29 9 21 21 24 31 17 15 21
+ 
+ 13 19 19 22 22 30 41 22 18 20
+ 
+ 26 33 14 14 16 22 26 10 16 24
+ 
+ 1. Construct a frequency distribution for the data.
+ 
+ 2. Construct a histogram for the data.
+ 
+ 3.Describe the shape of the histogram.
+ 
+ 4. Based on your answer to question 3,do you feel that the distribution is approximately normal?
+ 
+ 5. Find the mean and standard deviation for the data.
+ 
+ 6. What percent of the data values fall within 1 standard deviation of the mean?
+ 
+ 7. What percent of the data values fall within 2 standard deviations of the mean?
+ 
+ 8. What percent of the data values fall within 3 standard deviations of the mean?
+ 
+ 9. Does your answer help support the conclusion you reached in question 4? Explain.
+ 
+# 1. Construct a frequency distribution for the data.
+```{r}
+data<-c(67, 84, 80, 77, 97, 59, 62, 37, 33, 42, 36, 54, 18, 12,
+        19, 33, 49, 24, 25, 22, 24, 29, 9, 21, 21, 24, 31, 17, 
+        15, 21, 13, 19, 19, 22, 22, 30, 41, 22, 18, 20, 26, 33,
+        14, 14, 16, 22, 26, 10, 16, 24)
+data%>%
+  as.tibble()%>%
+  table()%>%
+  as.tibble()%>%
+  mutate(Freq=n)%>%
+  select(-n)->df
+  knitr::kable(df,format = 'markdown')
+```
+# 2. Construct a histogram for the data.
+
+Non classify
+```{r, warning=FALSE, message=FALSE}
+data%>%
+  as.tibble()%>%
+  ggplot(aes(x=value))+
+  geom_histogram(color='black')+
+  labs(x='Data',y='Frequency')+
+  ggtitle('The number of branches',subtitle = "Histogram(Non_class)")+
+  theme(plot.title = element_text(hjust=0.45),plot.subtitle = element_text(hjust=0.45))
+  
+```
+We should classify with $\sqrt{n}$ class 
+```{r}
+classify(data,round(sqrt(length(data)),0))->data1
+number =round((max(data)-min(data))/round(sqrt(length(data)),0),0)
+b<-seq(min(data),max(data)+number,by=number)
+data1
+```
+
+
+```{r}
+hist(data,
+     main='The number of branches',
+     sub='Histogram(class)',
+     col="blue",
+     xlab='The number of branches',
+     ylab='Frequency',
+     ylim=c(0,20),
+     breaks=b,
+     right = FALSE)
+text(midpoint(b),data1$Freq,data1$Freq)%>%
+knitr::kable(format = 'markdown')
+```
+#  3.Describe the shape of the histogram.
+
+By histogram we can said that the data is approximate positively skewed or Bimodal. 
+
+#  4. Based on your answer to question 3,do you feel that the distribution is approximately normal?
+
+```{r}
+find_outier(data)
+
+```
+```{r}
+remove<-function(a,x){
+  return(a[a!=x])
+}
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+data2=data
+for (i in c(67,77,80,84,97)) {
+  data2<-remove(data2,i)
+}
+data2%>%
+  as.tibble()%>%
+  ggplot(aes(x=value))+
+  geom_histogram(color='black')+
+  labs(x='Data',y='Frequency')+
+  ggtitle('The number of branches',subtitle = "Histogram(Non_class)")+
+  theme(plot.title = element_text(hjust=0.45),plot.subtitle = element_text(hjust=0.45))
+```
+```{r}
+classify(data2,round(sqrt(length(data2)),0))->data3
+number =round((max(data2)-min(data2))/round(sqrt(length(data2)),0),0)
+b<-seq(min(data2),max(data2)+number,by=number)
+data3
+```
+```{r}
+hist(data2,
+     main='The number of branches',
+     sub='Histogram(class)',
+     col="blue",
+     xlab='The number of branches',
+     ylab='Frequency',
+     ylim=c(0,20),
+     breaks=b,
+     right = FALSE)
+text(midpoint(b),data3$Freq,data3$Freq)%>%
+knitr::kable(format = 'markdown')
+```
+When I cut outlier I see the shape of graph is more approximate bell_shape. But I fell it still is not bell shape.
+
+#  5. Find the mean and standard deviation for the data..
+
+```{r}
+mean(data)
+message('Mean of data is ',round(mean(data),2))
+message('Varaint of data is ',round(varaint(data),2))
+message('Standaed deviation of data is ',round(sqrt(varaint(data)),2))
+```
+```{r}
+probability<-function(a,n,m){
+  d=0
+  for (i in 1:length(a)) {
+    if(a[i]<n && a[i]>m){
+      d=d+1
+    }
+  }
+  return(d/length(a))
+}
+```
+
+#  6. What percent of the data values fall within 1 standard deviation of the mean?
+
+Let x is data
+
+$P(|X-mean|<1SD)=P(mean-SD< X< mean+SD)$
+```{r}
+P=probability(data,mean(data)+sqrt(varaint(data)),mean(data)-sqrt(varaint(data)))
+message('The percent of the data values fall within 1 standard deviations of the mean is ',round((P)*100,0),'%')
+```
+# 7. What percent of the data values fall within 2 standard deviations of the mean?
+
+$P(|X-mean|<2SD)=P(mean-2SD< X< mean+2SD)$
+```{r}
+P=probability(data,mean(data)+2*sqrt(varaint(data)),mean(data)-2*sqrt(varaint(data)))
+message('The percent of the data values fall within 2 standard deviations of the mean is ',round((P)*100,0),'%')
+```
+# 8. What percent of the data values fall within 3 standard deviations of the mean?
+$P(|X-mean|<3SD)=P(mean-3SD< X< mean+3SD)$
+```{r}
+P=probability(data,mean(data)+3*sqrt(varaint(data)),mean(data)-3*sqrt(varaint(data)))
+message('The percent of the data values fall within 3 standard deviations of the mean is ',round((P)*100,0),'%')
+```
+#  9. Does your answer help support the conclusion you reached in question 4? Explain.
+
+Yes! it does. Because :
+
+The percent of the data values fall within 1 standard deviations of the mean is 80%
+
+The percent of the data values fall within 2 standard deviations of the mean is 92%
+
+The percent of the data values fall within 3 standard deviations of the mean is 98%
+
+By The Empirical (Normal)Rule the data is not bell shape.

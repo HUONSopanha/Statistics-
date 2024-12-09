@@ -230,7 +230,7 @@ data%>%
   theme(plot.title = element_text(hjust=0.45),plot.subtitle = element_text(hjust=0.45))
 ```
 
-# Peyton Manning’s Colts Career Peyton Manning played for the Indianapolis Colts for 14 years. (He did no t play in 2011.) The data show the number of touch-downs he scored for the years 1998–2010. Construct a dotplot for the data and comment on the graph.
+# 14.Peyton Manning’s Colts Career Peyton Manning played for the Indianapolis Colts for 14 years. (He did no t play in 2011.) The data show the number of touch-downs he scored for the years 1998–2010. Construct a dotplot for the data and comment on the graph.
 
 ```{r, warning=FALSE, message=FALSE}
 Peyton<-c(26 ,33 ,27, 49, 31, 27, 33, 26, 26, 29, 28, 31, 33)
@@ -256,7 +256,7 @@ ggplot(df,aes(x=value,fill =people))+
 
 ```
 
-# 6. The traffic situation in X-City is getting worse, and it is high time a solution was offered.The company hired to work on the project took a survey of the estimated amount of vehicles that move on the road daily and for various intervals. The result of this survey is illustrated in the table below.Construct a multiple line graph to visualize the data. Hence, determine the vehicle with the highest frequency and that with the lowest frequency.
+# 16. The traffic situation in X-City is getting worse, and it is high time a solution was offered.The company hired to work on the project took a survey of the estimated amount of vehicles that move on the road daily and for various intervals. The result of this survey is illustrated in the table below.Construct a multiple line graph to visualize the data. Hence, determine the vehicle with the highest frequency and that with the lowest frequency.
 
 ```{r,, warning=FALSE, message=FALSE}
 vehicle <-tibble(
@@ -445,7 +445,7 @@ varaint<-function(a){
   for (i in 1:length(a)) {
     s=c(s,(abs(a[i]-n))^2)
   }
-  return(sum(s)/length(a))
+  return(sum(s)/(length(a)-1))
 }
 classify<-function(a,n){
   number =round((max(a)-min(a))/n)
@@ -512,7 +512,7 @@ varaint_class<-function(a,b){
   a%>%
     mutate(Mid_range=mid)%>%
     mutate(V=(Mid_range-n)^2)->a
-  sum(a$V)/sum(a$Freq)%>%
+  sum(a$V)/(sum(a$Freq)-1)%>%
     return()
 }
 ```
@@ -550,7 +550,7 @@ x%>%
 x$Freq%>%
     sum()/2->t # find medium 
 # t=15 close to 16
-Cf=16 # Commulative of medium
+Cf=7 # Commulative of medium
 l=64 # lower of Medium
 f=9 # frequency of medium
 median=l+((t-Cf)/f)*number
@@ -563,9 +563,9 @@ message("Median of data is ", round(median,2))
 x$Freq%>%
     sum()/4->t # find position Q1
 # t=7.5 in 64-76
-Cf=16 # Commulative of Q1
-l=64 # lower of Q1
-f=9 # frequency of Q1
+Cf=1 # Commulative of lower Q1
+l=52 # lower of Q1
+f=6 # frequency of Q1
 Q1=l+((t-Cf)/f)*number
 message("Q1 of data is ", round(Q1,2))
 ```
@@ -574,7 +574,7 @@ message("Q1 of data is ", round(Q1,2))
 x$Freq%>%
     sum()*3/4->t # find position 
 # t=22.5 in 76-88
-Cf=24 # Commulative of Q3
+Cf=16 # Commulative of Q3
 l=76 # lower of Q3
 f=8 # frequency of Q3
 Q3=l+((t-Cf)/f)*number
@@ -749,7 +749,7 @@ x$Freq%>%
     sum()/2->t 
 # find medium 
 # t=15 close to 20
-Cf=15 # Commulative of medium
+Cf=6 # Commulative of medium
 l=2.1 # lower of Medium
 f=9 # frequency of medium
 median=l+((t-Cf)/f)*number
@@ -762,9 +762,9 @@ message("Median of data is ", round(median,2))
 x$Freq%>%
     sum()/4->t# find position Q1
 # t=7.5 in [2.1,3.7)	
-Cf=15 # Commulative of Q1
-l=2.1 # lower of Q1
-f=9 # frequency of Q1
+Cf=0 # Commulative of Q1
+l=0.5 # lower of Q1
+f=6 # frequency of Q1
 Q1=l+((t-Cf)/f)*number
 message("Q1 of data is ", round(Q1,2))
 ```
@@ -773,7 +773,7 @@ message("Q1 of data is ", round(Q1,2))
 x$Freq%>%
     sum()*3/4->t # find position 
 # t=22.5 in [3.7,5.3)	
-Cf=23 # Commulative of Q3
+Cf=15 # Commulative of Q3
 l=3.7 # lower of Q3
 f=8 # frequency of Q3
 Q3=l+((t-Cf)/f)*number
